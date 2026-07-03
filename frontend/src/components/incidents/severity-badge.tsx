@@ -1,27 +1,15 @@
 import { cn } from "@/lib/utils";
 import type { Severity } from "@/types";
 
-const SEVERITY_CONFIG: Record<Severity, { label: string; className: string }> = {
-  sev1: {
-    label: "SEV1",
-    className:
-      "bg-red-500/15 text-red-400 border-red-500/30 dark:bg-red-500/15 dark:text-red-400",
-  },
-  sev2: {
-    label: "SEV2",
-    className:
-      "bg-orange-500/15 text-orange-400 border-orange-500/30 dark:bg-orange-500/15 dark:text-orange-400",
-  },
-  sev3: {
-    label: "SEV3",
-    className:
-      "bg-amber-500/15 text-amber-400 border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400",
-  },
-  sev4: {
-    label: "SEV4",
-    className:
-      "bg-slate-500/15 text-slate-400 border-slate-500/30 dark:bg-slate-500/15 dark:text-slate-400",
-  },
+/**
+ * Severity as a mono glyph + text mark, no background pill. Only sev1
+ * carries the signal color; everything below it steps down in ink.
+ */
+const SEVERITY_CONFIG: Record<Severity, { glyph: string; label: string; className: string }> = {
+  sev1: { glyph: "▲", label: "SEV1", className: "font-semibold text-primary" },
+  sev2: { glyph: "▲", label: "SEV2", className: "font-medium text-foreground" },
+  sev3: { glyph: "△", label: "SEV3", className: "text-muted-foreground" },
+  sev4: { glyph: "△", label: "SEV4", className: "text-muted-foreground" },
 };
 
 export function SeverityBadge({ severity, className }: { severity: Severity; className?: string }) {
@@ -29,11 +17,12 @@ export function SeverityBadge({ severity, className }: { severity: Severity; cla
   return (
     <span
       className={cn(
-        "inline-flex h-5 w-fit shrink-0 items-center justify-center rounded-md border px-1.5 font-mono text-[11px] font-semibold tracking-wide",
+        "inline-flex shrink-0 items-baseline gap-1 font-mono text-[11px] tracking-wide whitespace-nowrap",
         config.className,
         className,
       )}
     >
+      <span aria-hidden>{config.glyph}</span>
       {config.label}
     </span>
   );

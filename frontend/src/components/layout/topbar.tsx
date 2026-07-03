@@ -1,7 +1,17 @@
-import { Menu, Moon, Sun } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
+
+/** Live UTC clock, HH:MM:SS, ticking every second. */
+function useUtcClock(): string {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  return now.toISOString().slice(11, 19);
+}
 
 export function Topbar({
   title,
@@ -11,36 +21,44 @@ export function Topbar({
   onOpenMobileNav: () => void;
 }) {
   const { theme, toggleTheme } = useTheme();
+  const clock = useUtcClock();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
+    <header className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-background px-4">
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
           onClick={onOpenMobileNav}
+          className="font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase transition-colors duration-120 hover:text-foreground md:hidden"
           aria-label="Open menu"
         >
-          <Menu className="size-4" />
-        </Button>
-        <h1 className="text-sm font-semibold text-foreground">{title}</h1>
+          Menu
+        </button>
+        <h1 className="font-mono text-xs font-medium tracking-[0.08em] text-foreground uppercase">
+          <span className="text-muted-foreground">Incident/Copilot /</span> {title}
+        </h1>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
+      <div className="flex items-center gap-4">
+        <span className="hidden font-mono text-xs text-muted-foreground tabular-nums sm:inline">
+          {clock} UTC
+        </span>
+        <span className="flex items-center gap-1.5 font-mono text-[11px] font-medium tracking-[0.08em] text-primary">
+          {/* rounded-full is intentional: the LIVE pulse dot is the one allowed circle */}
+          <span className="size-1.5 animate-live-pulse rounded-full bg-primary" aria-hidden />
+          LIVE
+        </span>
+        <button
+          type="button"
           onClick={toggleTheme}
+          className="font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase transition-colors duration-120 hover:text-foreground"
           aria-label="Toggle theme"
         >
-          {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
-        </Button>
-        <Avatar className="size-7">
-          <AvatarFallback className="bg-indigo-500/15 text-[11px] font-medium text-indigo-400">
-            EW
-          </AvatarFallback>
-        </Avatar>
+          {theme === "dark" ? "Light" : "Dark"}
+        </button>
+        <span className="font-mono text-[11px] font-medium tracking-[0.08em] text-foreground">
+          EW
+        </span>
       </div>
     </header>
   );

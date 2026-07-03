@@ -1,42 +1,28 @@
 import { cn } from "@/lib/utils";
 import type { Status } from "@/types";
 
-const STATUS_CONFIG: Record<Status, { label: string; dotClassName: string; textClassName: string }> = {
-  open: {
-    label: "Open",
-    dotClassName: "bg-rose-500",
-    textClassName: "text-rose-400",
-  },
-  investigating: {
-    label: "Investigating",
-    dotClassName: "bg-amber-500",
-    textClassName: "text-amber-400",
-  },
-  mitigated: {
-    label: "Mitigated",
-    dotClassName: "bg-blue-500",
-    textClassName: "text-blue-400",
-  },
-  resolved: {
-    label: "Resolved",
-    dotClassName: "bg-emerald-500",
-    textClassName: "text-emerald-400",
-  },
+/**
+ * Status as a mono glyph + text mark. The glyph encodes progress
+ * (● → ◐ → ◑ → ○); only "open" carries the signal color.
+ */
+const STATUS_CONFIG: Record<Status, { glyph: string; label: string; className: string }> = {
+  open: { glyph: "●", label: "OPEN", className: "font-medium text-primary" },
+  investigating: { glyph: "◐", label: "INVESTIGATING", className: "text-foreground" },
+  mitigated: { glyph: "◑", label: "MITIGATED", className: "text-muted-foreground" },
+  resolved: { glyph: "○", label: "RESOLVED", className: "text-muted-foreground" },
 };
 
 export function StatusBadge({ status, className }: { status: Status; className?: string }) {
   const config = STATUS_CONFIG[status];
-  const isLive = status === "open" || status === "investigating";
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium", config.textClassName, className)}>
-      <span className="relative flex size-1.5">
-        {isLive && (
-          <span
-            className={cn("absolute inline-flex h-full w-full animate-ping rounded-full opacity-75", config.dotClassName)}
-          />
-        )}
-        <span className={cn("relative inline-flex size-1.5 rounded-full", config.dotClassName)} />
-      </span>
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-baseline gap-1 font-mono text-[11px] tracking-wide whitespace-nowrap",
+        config.className,
+        className,
+      )}
+    >
+      <span aria-hidden>{config.glyph}</span>
       {config.label}
     </span>
   );
